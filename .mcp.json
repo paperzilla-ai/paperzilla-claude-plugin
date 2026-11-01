@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "paperzilla": {
+      "type": "http",
+      "url": "https://paperzilla.ai/api/mcp"
+    }
+  }
+}

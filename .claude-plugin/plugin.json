@@ -1,0 +1,25 @@
+{
+  "name": "paperzilla",
+  "displayName": "Paperzilla",
+  "version": "1.1.6",
+  "description": "Prepare morning research briefs from focused Paperzilla feeds, explore public digests, and discuss papers that matter to your field.",
+  "author": {
+    "name": "Paperzilla",
+    "email": "hello@paperzilla.ai",
+    "url": "https://paperzilla.ai"
+  },
+  "homepage": "https://paperzilla.ai",
+  "repository": "https://github.com/paperzilla-ai/paperzilla-claude-plugin",
+  "license": "Proprietary",
+  "keywords": [
+    "research",
+    "papers",
+    "morning-brief",
+    "feeds"
+  ],
+  "icon": "./assets/icon.png",
+  "documentationUrl": "https://docs.paperzilla.ai/guides/claude",
+  "supportUrl": "https://docs.paperzilla.ai/guides/mcp",
+  "privacyPolicyUrl": "https://paperzilla.ai/privacy",
+  "termsOfServiceUrl": "https://paperzilla.ai/terms"
+}
