@@ -1,9 +1,10 @@
 ---
 name: paperzilla-research-brief
-description: For the Paperzilla production plugin. Prepare daily morning research
-  briefs across one or more Paperzilla project feeds. Use for recurring paper monitoring,
-  new-paper triage, relevance ranking, on-demand reading lists and discussion from
-  feeds or public digests, or explicit feedback on papers in owned project feeds.
+description: For the Paperzilla production plugin. Guide users to their first
+  personal research brief and prepare daily briefs across one or more Paperzilla
+  project feeds. Use for recurring paper monitoring, new-paper triage, relevance
+  ranking, on-demand reading lists and discussion from feeds or public digests,
+  or explicit feedback on papers in owned project feeds.
 license: MIT
 metadata:
   skill-author: Paperzilla
@@ -17,7 +18,8 @@ metadata:
 
 This skill belongs to **Paperzilla** (`paperzilla`), the **production** plugin. Its only MCP server is `paperzilla` at **https://paperzilla.ai/api/mcp**.
 
-Use tools from this connection only. **Paperzilla beta** is a different connection; never use it as a fallback, including for read-only calls. If this connection is unavailable, follow the first-use connection steps below and resume the original request afterward. If the user wants the other environment, have them select that plugin instead.
+Use tools from this connection only. If this connection is unavailable, follow
+the first-use connection steps below and resume the original request afterward.
 
 # Paperzilla morning brief
 
@@ -29,8 +31,7 @@ one-off briefs, public digest discovery, and deeper paper discussion also work.
 ## Connect the intended account first
 
 Use the Paperzilla connection declared by the plugin that invoked this skill.
-Respect its server environment and the user's chosen account. Production and
-beta have separate connections even when they expose similar tools or data.
+Respect its server environment and the user's chosen account.
 Never silently use another Paperzilla connector because it is already signed
 in. If the available tool identities or connection metadata do not distinguish
 the intended connection, ask the user to select it before reading research.
@@ -40,9 +41,8 @@ disabled in the current chat. If the intended tools are unavailable, explain
 that installation alone does not establish the connection; do not claim its
 credentials expired or that the account has no projects without evidence.
 In Claude, direct the user to
-**Settings → Customize → Plugins → Paperzilla → Connectors**
-(**Paperzilla beta** for the staging plugin), then **Connect** next to that
-plugin's Paperzilla entry. Claude may show **Connect** twice: the first adds the
+**Settings → Customize → Plugins → Paperzilla → Connectors**, then **Connect**
+next to the Paperzilla entry. Claude may show **Connect** twice: the first adds the
 bundled connector to Claude. If it then shows **Not connected**, select
 **Connect** again to open Paperzilla sign-in and OAuth consent. Adding the
 connector alone does not authorize account access; **Connected** confirms the
@@ -50,21 +50,50 @@ sign-in step is complete. They do not need to paste a server URL. An existing
 connection can be reused only for the same server URL and intended account.
 In other clients, use that Paperzilla integration's native Connect action.
 Leave sign-in, consent and connection changes to the user.
+Give the next applicable connection step. If the user wants a walkthrough,
+link to the [Claude connection guide](https://docs.paperzilla.ai/guides/claude#open-the-connection-setup).
 
 Keep the original request's selected feeds, interests, date window, output
 format and scheduling preferences in the current conversation while waiting.
 When the user returns, check the intended connection with a fresh
 `account_status` call, then continue the original request; do not ask them to
 repeat details still available in the conversation. Resolve projects only when
-needed. Do not substitute beta results, invent a completed brief, or create a
-schedule while the requested connection is unavailable. This pause does not
-create persistent state or arrange an automatic follow-up.
+needed. Do not invent a completed brief or create a schedule while the
+requested connection is unavailable. This pause does not create persistent
+state or arrange an automatic follow-up.
+
+## Guide the first personal brief
+
+Use the project the user chose for their first brief. Call `projects_list` when
+you need to resolve that project or see their options. If they have one project
+and it fits the request, read its feed and give the brief when papers are
+available. Ask which project to use only when the choice is ambiguous.
+
+For a personal brief, start topic setup as soon as a Paperzilla tool returns
+`status: needs_project` or `account_status` reports `needs_project` in
+`capabilities.personalized_feeds`.
+
+Before the first setup reply, use an available web tool to open the
+[Claude guide](https://docs.paperzilla.ai/guides/claude#create-a-research-topic)
+and read **Create a research topic**. If the page cannot be fetched, use the
+guidance below.
+
+The user creates their project in the Paperzilla chat. Send this one-sentence
+reply as soon as they need to create a research topic.
+
+> Open a [new topic chat on Paperzilla](https://paperzilla.ai/digests/new) with the account you connected to Claude and follow the prompts until your project is saved, then come back to this Claude chat for the next step ([topic setup guide](https://docs.paperzilla.ai/guides/claude#create-a-research-topic)).
+
+If the user asks for help, explain their next step on Paperzilla. They
+describe their topic, review the suggested categories and keywords, select
+**Create project**, and complete any account confirmation Paperzilla prompts
+them for. Suggest wording they can paste into the Paperzilla chat if helpful.
+
+When the user says the project is saved, use fresh `projects_list` and
+`feed_get` calls to continue the original brief request. If Paperzilla or the
+user confirms the first papers are being prepared, ask them to return to this
+Claude chat when those papers are ready.
 
 ## Set up a morning brief
-
-At first setup, explain the read-only approval recommendation in **Connection
-and scope** below, including why it matters for an unattended morning brief.
-Keep it brief and continue the user's request; do not repeat it on every run.
 
 Use the projects and preferences already identified in the conversation. Resolve
 names to project IDs with `projects_list`, following its pagination when needed;
@@ -152,14 +181,15 @@ Use the connected Paperzilla MCP tools and the source the user requested.
   `paper_get` when additional metadata or resolution of an ID, DOI, or supported
   paper URL is needed. Resolve ambiguous candidates before analyzing a paper.
 
-Do not require a project for public digests or catalog papers. If a personalized
-request returns `needs_project`, explain the setup step using the returned
-`setup_url` and offer a relevant public digest in the meantime. An empty or
-paused preview is an ordinary product state, not a sign-in failure.
+Public digests and catalog papers are available before project setup. Use
+public digests when the user asks for public research or a sample brief.
+When a personal brief request returns `needs_project`, follow
+[Guide the first personal brief](#guide-the-first-personal-brief).
+For other personal-feed requests with that result, give the `setup_url` that
+Paperzilla returned and ask the user to finish the topic setup there.
 
-Ask which project or topic only when the request and conversation do not identify
-one. Ask for one sentence about the user's research goal when it would change
-the ranking; otherwise give a useful first reading list immediately.
+Ask for one sentence about the user's research goal when it would change the
+ranking. Otherwise give a useful first reading list immediately.
 
 ## Select and explain
 
@@ -238,18 +268,16 @@ failed.
 
 ## Connection and scope
 
-For a smooth research experience, recommend standing approval for **all
-Paperzilla read-only tools** in the host client's tool settings. Explain why:
-a morning brief reads accounts, projects, feed pages and papers through several
-calls. Approval prompts can interrupt those lookups; an unattended run may wait
-for approval instead of finishing, depending on the host's task approval mode.
-Mention this once during first-brief setup, when arranging recurring delivery,
-or when repeated prompts interrupt research. Do not make standing approval a
-condition for a one-off brief if the user prefers to approve reads individually.
+When the user asks to schedule a brief or an approval prompt blocks their
+request, explain the option to allow **all Paperzilla read-only tools** in the
+host client's settings. A morning brief makes several account, project, feed,
+and paper lookups. An unattended run may wait for manual approval depending on
+the host's task approval mode. For a one-off brief, proceed with individual
+approvals when the user chooses them.
 
-In Claude, use **Settings → Customize → Connectors → Paperzilla → Tool permissions**
-(Paperzilla beta for staging). Set the **Read-only tools** group to **Always allow**,
-or apply it to every read-only tool individually. This covers account status,
+In Claude, use **Settings → Customize → Connectors → Paperzilla → Tool permissions**.
+Set the **Read-only tools** group to **Always allow**, or apply it to every
+read-only tool individually. This covers account status,
 projects and feeds, public digests, paper details and prepared Markdown. It
 keeps Paperzilla's account and OAuth scope restrictions in place. Keep
 `paper_markdown_request`, `feedback_set`, and `feedback_clear` on **Needs approval**
@@ -268,10 +296,10 @@ reuse earlier results as fresh.
 
 Use `account_status` when checking connection capabilities would help. Its
 `capabilities` and `guidance` declare account access, not the outcome of a
-digest or paper lookup. Explain available public research when no project
-exists; suggest project setup for personalized feeds. If the user asks to
-test public access, make a public digest or paper read and report its actual
-result rather than stopping at the account check.
+digest or paper lookup. If personal feeds need a project, follow
+[Guide the first personal brief](#guide-the-first-personal-brief) for a
+personal brief request. When the user asks to test public access, read a public
+digest or paper and report the result.
 
 An authentication error requires reconnection through the connected Paperzilla
 integration's sign-in or Connect action; an insufficient-scope response requires
