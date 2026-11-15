@@ -1,7 +1,7 @@
 ---
 name: paperzilla-research-brief
 description: For the Paperzilla production plugin. Guide users to their first
-  personal research brief and prepare daily briefs across one or more Paperzilla
+  personal research brief, check project access, and prepare daily briefs across one or more Paperzilla
   project feeds. Use for recurring paper monitoring, new-paper triage, relevance
   ranking, on-demand reading lists and discussion from feeds or public digests,
   or explicit feedback on papers in owned project feeds.
@@ -64,6 +64,10 @@ state or arrange an automatic follow-up.
 
 ## Guide the first personal brief
 
+If the user asks whether you have access to their Paperzilla projects, call
+a fresh `projects_list` and name any projects it returns. If they still need a
+project, give the topic setup step below.
+
 Use the project the user chose for their first brief. Call `projects_list` when
 you need to resolve that project or see their options. If they have one project
 and it fits the request, read its feed and give the brief when papers are
@@ -78,10 +82,13 @@ Before the first setup reply, use an available web tool to open the
 and read **Create a research topic**. If the page cannot be fetched, use the
 guidance below.
 
-The user creates their project in the Paperzilla chat. Send this one-sentence
-reply as soon as they need to create a research topic.
+The user creates their project in the Paperzilla chat. Use the returned
+`setup_url` or `account_status.project_setup_url` as the setup link. Use
+`https://paperzilla.ai/digests/new?briefAgent=claude` if the tool gives no
+tagged setup link. Send this one-sentence reply as soon as the user needs to
+create a research topic.
 
-> Open a [new topic chat on Paperzilla](https://paperzilla.ai/digests/new) with the account you connected to Claude and follow the prompts until your project is saved, then come back to this Claude chat for the next step ([topic setup guide](https://docs.paperzilla.ai/guides/claude#create-a-research-topic)).
+> Open a [new topic chat on Paperzilla]({setup_url}) with the account you connected to Claude and follow the prompts until your project is saved, then come back to this Claude chat for the next step ([topic setup guide](https://docs.paperzilla.ai/guides/claude#create-a-research-topic)).
 
 If the user asks for help, explain their next step on Paperzilla. They
 describe their topic, review the suggested categories and keywords, select
