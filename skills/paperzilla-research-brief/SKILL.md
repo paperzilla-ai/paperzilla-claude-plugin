@@ -96,9 +96,8 @@ describe their topic, review the suggested categories and keywords, select
 them for. Suggest wording they can paste into the Paperzilla chat if helpful.
 
 When the user says the project is saved, use fresh `projects_list` and
-`feed_get` calls to continue the original brief request. If Paperzilla or the
-user confirms the first papers are being prepared, ask them to return to this
-Claude chat when those papers are ready.
+`feed_get` calls to continue the original brief request. Follow the preview
+guidance below for that project.
 
 ## Set up a morning brief
 
@@ -129,8 +128,25 @@ it has not been scheduled. Do not imply that this chat will wake up on its own.
 
 ## Run the daily brief
 
-Make fresh feed calls on every run. Capture a UTC start time as the end of the
-reporting window. For each selected project, use
+Make fresh feed calls for every brief. For an on-demand first brief, call
+`feed_get` without a default date filter. Honor the user's filters and follow
+`next_offset` with those same filters.
+
+When a feed includes `preview`, use its stage and guidance in the reply.
+
+- `queued`, `searching`, `reviewing`, or `preparing_email`. Share the email
+  timing from the tool and invite the user to return after the email arrives.
+- `ready`. Give the brief from the papers in the feed.
+- `no_results`. Say the preview found no matches and offer to help refine the
+  topic in chat. Suggest wording or filters the user can review in Paperzilla.
+- `failed`. Explain the preview problem using the tool guidance.
+
+Give project-specific updates for pending, empty, and failed previews and
+include papers from other selected feeds. Advance a project's coverage only
+after fully checking an ordinary feed or a feed with a ready preview.
+
+For recurring briefs, capture a UTC start time as the end of the reporting window.
+For each selected project, use
 `feed_get(project_id=..., since=..., limit=50)` and follow `next_offset` with the
 same `since` to cover that window. Omit `must_read` unless the user wants only
 that subset. Use feed-added `ready_at` to identify new entries, including older
